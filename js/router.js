@@ -13,10 +13,8 @@ var router = {};
  *
  */
 router.init = function() {
-
   router.loadContent();
   router.listenPageChange();
-
 };
 
 /**
@@ -25,19 +23,13 @@ router.init = function() {
  * @return {string} slug Slug from URL
  */
 router.getSlug = function() {
-
   slug = window.location.hash;
 
-  if( "" === slug ) {
-
+  if ("" === slug) {
     return null;
-
   } else {
-
-    return slug.substr( 1 );
-
+    return slug.substr(1);
   }
-
 };
 
 /**
@@ -45,11 +37,8 @@ router.getSlug = function() {
  *
  */
 router.listenPageChange = function() {
-
-  window.addEventListener( 'hashchange', router.loadContent, false );
-
-}
-
+  window.addEventListener("hashchange", router.loadContent, false);
+};
 
 /**
  * Determines whether to load blog posts
@@ -58,19 +47,15 @@ router.listenPageChange = function() {
  */
 
 router.loadContent = function() {
-
   var url = router.getSlug();
 
   view.clearContent();
 
-  if( null === url ) {
-
-   view.loadBlogPosts();
-
+  if (null === url) {
+    view.loadSingleContent("home");
+  } else if ("blog" === url) {
+    view.loadBlogPosts();
   } else {
-
-   view.loadBlogPost( url );
-
+    view.loadSingleContent(url);
   }
-
-}
+};

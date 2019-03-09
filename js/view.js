@@ -35,16 +35,27 @@ view.loadBlogPosts = function() {
 };
 
 /**
- * Displays a single post on the page based on URL
+ * Displays a single post or page   based on URL
  *
  */
-view.loadBlogPost = function(url) {
-  var post = model.getPost(url),
+view.loadSingleContent = function(slug) {
+  var contentObj = model.getPost(slug),
     titleEl = helpers.getPageTitleEl(),
     contentEl = helpers.getPageContentEl();
 
-  titleEl.innerHTML = post.title;
-  contentEl.innerHTML = post.content;
+  if (null === contentObj) {
+    contentObj = model.getPage(slug);
+  }
+
+  if (null === contentObj) {
+    contentObj = {
+      title: "404 Error",
+      content: "Content not found"
+    };
+  }
+
+  titleEl.innerHTML = contentObj.title;
+  contentEl.innerHTML = contentObj.content;
 };
 
 /**
