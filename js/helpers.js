@@ -8,30 +8,53 @@
 var helpers = {};
 
 /**
- * Creates a list item with link inside for menus
+ * Creates a list item with a link inside for menus
+ *
+ * @param {Object} contentObj Page object to create menu item for
+ * @return {Object} menuItemEl List item DOM object
  */
-
 helpers.createMenuItem = function(contentObj) {
   var menuItemEl = document.createElement("li");
+
   menuItemEl.appendChild(helpers.createLink(contentObj));
+
   return menuItemEl;
 };
 
 /**
  * Creates link
+ *
+ * @param {Object} contentObj Content object to create link for
+ * @return {Object} linkEl Link object
  */
-
 helpers.createLink = function(contentObj) {
   var linkEl = document.createElement("a"),
     linkTitle = document.createTextNode(contentObj.title);
+
+  if ("home" !== contentObj.slug) {
+    linkEl.href = "#" + contentObj.slug;
+  } else {
+    linkEl.href = "#";
+  }
   linkEl.appendChild(linkTitle);
 
-  if ("home" === contentObj.slug) {
-    linkEl.href = "#";
-  } else {
-    linkEl.href = "#" + contentObj.slug;
-  }
   return linkEl;
+};
+
+/**
+ * Gets all links
+ * @return {Object[]} All link elements
+ */
+helpers.getLinks = function() {
+  return document.querySelectorAll("a");
+};
+
+/**
+ * Gets the main menu element
+ * @return {Object} Main menu DOM object
+ */
+helpers.getMainMenuEl = function() {
+  return document.querySelector("#mainNav ul");
 };
 
 /**
@@ -51,9 +74,49 @@ helpers.getPageContentEl = function() {
 };
 
 /**
- * Gets main menu from the DOM
- * @return {Object} Main page title DOM object
+ * Gets editor Element in the DOM
+ * @return {Object} Main editor DOM object
  */
-helpers.getMainMenuEl = function() {
-  return document.querySelector("#mainNav ul ");
+helpers.getEditorEl = function() {
+  return document.getElementById("editor");
+};
+
+/**
+ * Gets editor toggle Element in the DOM
+ * @return {Object} Main toggle element
+ */
+helpers.getEditorToggleEl = function() {
+  return document.getElementById("editorToggle");
+};
+
+/**
+ * Gets editor toggle link Element in the DOM
+ * @return {Object} Main toggle link
+ */
+helpers.getEditorToggleLink = function() {
+  return document.querySelector("#editorToggle a");
+};
+
+/**
+ * Gets editor title form element
+ * @return {Object} Title form element
+ */
+helpers.getEditorTitleEl = function() {
+  return document.getElementById("editTitle");
+};
+
+/**
+ * Gets editor content form element
+ * @return {Object} Content form element
+ */
+helpers.getEditorContentEl = function() {
+  return document.getElementById("editContent");
+};
+
+/**
+ * Gets editor form update button
+ * @return {Object} Content form element
+ */
+helpers.getEditorUpdateBtnEl = function() {
+  return document.getElementById("editUpdateBtn");
 };

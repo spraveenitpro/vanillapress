@@ -35,27 +35,36 @@ view.loadBlogPosts = function() {
 };
 
 /**
- * Displays a single post or page   based on URL
+ * Displays a single post or page based on URL
  *
  */
 view.loadSingleContent = function(slug) {
-  var contentObj = model.getPost(slug),
+  var contentObj = model.getContent(slug),
     titleEl = helpers.getPageTitleEl(),
     contentEl = helpers.getPageContentEl();
 
-  if (null === contentObj) {
-    contentObj = model.getPage(slug);
-  }
-
-  if (null === contentObj) {
-    contentObj = {
-      title: "404 Error",
-      content: "Content not found"
-    };
-  }
-
   titleEl.innerHTML = contentObj.title;
   contentEl.innerHTML = contentObj.content;
+};
+
+/**
+ * Updates the main title for a page or post
+ *
+ */
+view.updateTitle = function(title) {
+  var titleEl = helpers.getPageTitleEl();
+
+  titleEl.innerHTML = title;
+};
+
+/**
+ * Updates the main content for a page or post
+ *
+ */
+view.updateContent = function(content) {
+  var contentEl = helpers.getPageContentEl();
+
+  contentEl.innerHTML = content;
 };
 
 /**
@@ -71,15 +80,16 @@ view.clearContent = function() {
 };
 
 /**
- * Create main menu for pages
+ * Creates Main Menu Links for Pages
+ *
  */
-
 view.createMainMenu = function() {
   var pages = model.getPages(),
     menuMarkup = document.createDocumentFragment(),
     mainMenuEl = helpers.getMainMenuEl();
 
   for (var i = 0, max = pages.length; i < max; i++) {
+    // Create menu markup
     menuMarkup.appendChild(helpers.createMenuItem(pages[i]));
   }
 
@@ -95,12 +105,9 @@ view.createMainMenu = function() {
 view.createPostMarkup = function(post) {
   var articleEl = document.createElement("article"),
     titleEl = document.createElement("h3"),
-    titleLink = document.createElement("a"),
-    title = document.createTextNode(post.title),
+    titleLink = helpers.createLink(post),
     contentEl = document.createElement("div");
 
-  titleLink.appendChild(title);
-  titleLink.href = "#" + post.slug;
   titleEl.appendChild(titleLink);
   contentEl.appendChild(document.createTextNode(post.content));
 
