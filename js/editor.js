@@ -15,22 +15,25 @@ editor.unSavedContent = false;
  * Initializes the VanillaPress app
  *
  */
+
 editor.init = function() {
   editor.listenEditorToggle();
+  editor.checkEditorHidden();
 };
 
 /**
  * Updates local storage for post or page
  *
  */
-editor.saveContent = function(event) {
+editor.updateContent = function(event) {
   event.preventDefault();
   model.updateContent(editor.currentContent);
   editor.unSavedContent = false;
+  editor.animateSaveBtn();
 };
 
 /**
- * Update the title when changed in editor
+ * Runs when changes take place to editor title
  *
  */
 editor.updateTitle = function() {
@@ -42,10 +45,10 @@ editor.updateTitle = function() {
 };
 
 /**
- * Update the content when changed in editor
+ * Runs when changes take place to editor title
  *
  */
-editor.updateContent = function() {
+editor.updateMainContent = function() {
   var content = helpers.getEditorContentEl().value;
 
   editor.currentContent.content = content;
@@ -57,14 +60,42 @@ editor.updateContent = function() {
  * Dynamically fills the edit form based on the url
  *
  */
-editor.fillEditForm = function(contentObj) {
+editor.loadEditForm = function(contentObj) {
   var titleForm = helpers.getEditorTitleEl(),
     contentForm = helpers.getEditorContentEl();
 
   titleForm.value = contentObj.title;
   contentForm.value = contentObj.content;
 
+  if ("blog" === contentObj.slug) {
+    contentForm.setAttribute("readonly", "readonly");
+  } else {
+    contentForm.removeAttribute("readonly");
+  }
+
   editor.addFormListeners();
+};
+
+/**
+ * Animates the Update button to mimic saving data
+ *
+ */
+editor.animateSaveBtn = function() {
+  var btn = helpers.getEditorUpdateBtnEl(),
+    saved = function() {
+      setTimeout(function() {
+        btn.innerText = "Update";
+      }, 1000);
+    };
+  saving = function() {
+    setTimeout(function() {
+      btn.innerText = "Saved!";
+      saved();
+    }, 900);
+  };
+
+  btn.innerText = "Saving...";
+  saving();
 };
 
 /**
@@ -72,14 +103,14 @@ editor.fillEditForm = function(contentObj) {
  *
  */
 editor.addFormListeners = function() {
-  var titleForm = helpers.getEditorTitleEl(),
-    contentForm = helpers.getEditorContentEl(),
+  var titleField = helpers.getEditorTitleEl(),
+    contentField = helpers.getEditorContentEl(),
     updateBtn = helpers.getEditorUpdateBtnEl(),
     links = helpers.getLinks();
 
-  titleForm.addEventListener("input", editor.updateTitle, false);
-  contentForm.addEventListener("input", editor.updateContent, false);
-  updateBtn.addEventListener("click", editor.saveContent, false);
+  titleField.addEventListener("input", editor.updateTitle, false);
+  contentField.addEventListener("input", editor.updateMainContent, false);
+  updateBtn.addEventListener("click", editor.updateContent, false);
 
   links.forEach(function(link) {
     link.addEventListener("click", editor.protectUnsavedContent, false);
@@ -120,12 +151,25 @@ editor.listenEditorToggle = function() {
 };
 
 /**
+ * Opens editor if local store has editor visible
+ *
+ */
+editor.checkEditorHidden = function() {
+  var isHidden = model.getEditorHidden();
+
+  if (false === isHidden) {
+    editor.toggle();
+  }
+};
+
+/**
  * Controls the toggle for the editor
  *
  */
 editor.toggle = function() {
   var editorEl = helpers.getEditorEl(),
-    toggleEl = helpers.getEditorToggleEl();
+    toggleEl = helpers.getEditorToggleEl(),
+    links = helpers.getLinks();
 
   editor.currentContent = model.getCurrentContent();
 
@@ -133,8 +177,13 @@ editor.toggle = function() {
   toggleEl.classList.toggle("hidden");
 
   if (false === toggleEl.classList.contains("hidden")) {
-    editor.fillEditForm(editor.currentContent);
+    editor.loadEditForm(editor.currentContent);
+    model.updateEditorHidden(false);
   } else {
-    // Remove event listeners from editor
+    model.updateEditorHidden(true);
+
+    links.forEach(function(link) {
+      link.removeEventListener("click", editor.protectUnsavedContent, false);
+    });
   }
 };
